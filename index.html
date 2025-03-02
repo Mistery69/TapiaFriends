@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Tapia - Calçotada</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            background-color: #f8f9fa; 
+            margin: 20px; 
+        }
+        .container { 
+            max-width: 600px; 
+            margin: auto; 
+            background: white; 
+            padding: 20px; 
+            border-radius: 5px; 
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1); 
+        }
+        input, select, button { 
+            margin: 10px 0; 
+            padding: 10px; 
+            width: 100%; 
+            border-radius: 5px; 
+            border: 2px solid #007bff; 
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+        }
+        button { 
+            background-color: #28a745; 
+            color: white; 
+            cursor: pointer; 
+            font-weight: bold; 
+        }
+        button:hover { 
+            background-color: #218838; 
+        }
+        table { 
+            width: 100%; 
+            margin-top: 20px; 
+            border-collapse: collapse; 
+            border: 2px solid #333; 
+            background: white; 
+        }
+        th, td { 
+            border: 2px solid #333; 
+            padding: 12px; 
+            text-align: center; 
+            font-size: 16px; 
+        }
+        th { 
+            background-color: #007bff; 
+            color: white; 
+        }
+        .delete-btn { 
+            background-color: red; 
+            color: white; 
+            padding: 5px 10px; 
+            border: none; 
+            cursor: pointer; 
+        }
+        .delete-btn:hover { 
+            background-color: darkred; 
+        }
+        .event-date { 
+            font-size: 26px; 
+            font-weight: bold; 
+            margin-top: 10px; 
+            color: #d9534f; 
+        }
+        .restaurant-title { 
+            font-size: 36px; 
+            font-weight: bold; 
+            color: #333; 
+            margin-bottom: 10px; 
+        }
+        label {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        .image-container img {
+            width: 50%;
+            max-width: 500px;
+            margin: 10px auto;
+            display: block;
+            border-radius: 10px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="restaurant-title">Restaurant Tapia</h1>
+
+    <div class="image-container">
+        <img src="IMG-20190102-WA0004.jpeg" alt="Restaurante">
+        <img src="20c3fe358d5e-portada-adobe-calsots-t.webp" alt="Calçots">
+        <img src="2024-04-06.jpg" alt="Plato Especial">
+    </div>
+
+    <h1 class="event-date">📅 22 de Març - CALÇOTADA 🔥</h1>
+
+    <div class="container">
+        <h2>📝 COMANDES</h2>
+        <label for="nombre">✨ Escriu el teu nom:</label>
+        <input type="text" id="nombre" placeholder="Escriu el teu nom">
+        <label for="menu">🍽️ Menú:</label>
+        <select id="menu">
+            <option value="MENU 1: CALÇOTADA + BUTIFARRA">MENU 1: CALÇOTADA + BUTIFARRA</option>
+            <option value="MENU 2: CALÇOTADA XAI">MENU 2: CALÇOTADA XAI</option>
+            <option value="MENU 3: CALÇOTADA Y CARTA">MENU 3: CALÇOTADA Y CARTA</option>
+            <option value="MENU 4: CARTA">MENU 4: CARTA</option>
+        </select>
+        <button onclick="agregarPedido()">✅ AFEGIR COMANDA</button>
+
+        <h3>📜 LLISTA DE COMANDES</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>👤 Nom</th>
+                    <th>🍽️ Menú</th>
+                    <th>🎭 Emoji</th>
+                    <th>❌ Eliminar</th>
+                </tr>
+            </thead>
+            <tbody id="listaPedidos"></tbody>
+        </table>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD0PYk12a-OfsmTXsul1uofhtDBeGTf_ak",
+            authDomain: "tapia2-ed963.firebaseapp.com",
+            databaseURL: "https://tapia2-ed963-default-rtdb.europe-west1.firebasedatabase.app/",
+            projectId: "tapia2-ed963",
+            storageBucket: "tapia2-ed963.firebasestorage.app",
+            messagingSenderId: "377440339576",
+            appId: "1:377440339576:web:e666e54170e60f0dcfcf8d",
+            measurementId: "G-GWSRMXN1M0"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const emojis = ["😃", "😂", "😎", "🤩", "😇", "🥳", "🧐", "🤠", "👽", "🎩"];
+
+        function agregarPedido() {
+            let nombre = document.getElementById("nombre").value.trim();
+            let menu = document.getElementById("menu").selectedOptions[0].text; 
+            let emoji = emojis[Math.floor(Math.random() * emojis.length)];
+
+            if (!nombre) {
+                alert("Escriu el teu nom.");
+                return;
+            }
+
+            let nuevoPedidoRef = push(ref(db, "pedidos"));
+            set(nuevoPedidoRef, {
+                nombre: nombre,
+                menu: menu,
+                emoji: emoji
+            });
+
+            document.getElementById("nombre").value = "";
+        }
+
+        function cargarPedidos() {
+            onValue(ref(db, "pedidos"), (snapshot) => {
+                let lista = document.getElementById("listaPedidos");
+                lista.innerHTML = "";
+                snapshot.forEach((childSnapshot) => {
+                    let pedido = childSnapshot.val();
+                    let key = childSnapshot.key;
+                    let fila = `<tr>
+                        <td>${pedido.nombre}</td>
+                        <td>${pedido.menu}</td>
+                        <td>${pedido.emoji || "🎭"}</td>
+                        <td><button class="delete-btn" onclick="eliminarPedido('${key}')">Eliminar</button></td>
+                    </tr>`;
+                    lista.innerHTML += fila;
+                });
+            });
+        }
+
+        function eliminarPedido(key) {
+            if (!confirm("Segur que vols eliminar la comanda?")) return;
+            remove(ref(db, "pedidos/" + key));
+        }
+
+        document.addEventListener("DOMContentLoaded", cargarPedidos);
+        window.agregarPedido = agregarPedido;
+        window.eliminarPedido = eliminarPedido;
+    </script>
+</body>
+</html>
